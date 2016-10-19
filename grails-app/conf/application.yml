@@ -1,0 +1,129 @@
+---
+hibernate:
+    cache:
+        queries: false
+        use_second_level_cache: true
+        use_query_cache: false
+        region.factory_class: 'org.hibernate.cache.ehcache.EhCacheRegionFactory'
+
+dataSource:
+    pooled: true
+    dbCreate: ''
+    jmxExport: true
+    driverClassName: com.mysql.jdbc.Driver
+    dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    username: root
+    password: admin
+    url: jdbc:mysql://localhost:3306/ttm?autoReconnect=true&characterEncoding=utf-8
+    # logSql: true
+    # formatSql: true
+    properties:
+        maxActive: -1
+        minEvictableIdleTimeMillis: 1800000
+        timeBetweenEvictionRunsMillis: 1800000
+        numTestsPerEvictionRun: 3
+        testOnBorrow: true
+        testWhileIdle: true
+        testOnReturn: true
+        validationQuery: SELECT 1
+
+environments:
+    development:
+        dataSource:
+            url: jdbc:mysql://localhost:3306/ttm?autoReconnect=true&characterEncoding=utf-8
+    test:
+        dataSource:
+            url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+    production:
+        dataSource:
+            url: jdbc:h2:./prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+---
+foo:
+    bar:
+        hello: 'hello'
+---
+locations: ['file:myconf.yml']
+---
+grails:
+    profile: web
+    codegen:
+        defaultPackage: rishiqing.notice.server
+    spring:
+        transactionManagement:
+            proxies: false
+    config:
+        locations: ['classpath:server-config.properties']
+info:
+    app:
+        name: '@info.app.name@'
+        version: '@info.app.version@'
+        grailsVersion: '@info.app.grailsVersion@'
+spring:
+
+    groovy:
+        template:
+            check-template-location: false
+
+---
+grails:
+    server:
+        port:
+            http: 1717
+    mime:
+        disable:
+            accept:
+                header:
+                    userAgents:
+                        - Gecko
+                        - WebKit
+                        - Presto
+                        - Trident
+        types:
+            all: '*/*'
+            atom: application/atom+xml
+            css: text/css
+            csv: text/csv
+            form: application/x-www-form-urlencoded
+            html:
+              - text/html
+              - application/xhtml+xml
+            js: text/javascript
+            json:
+              - application/json
+              - text/json
+            multipartForm: multipart/form-data
+            pdf: application/pdf
+            rss: application/rss+xml
+            text: text/plain
+            hal:
+              - application/hal+json
+              - application/hal+xml
+            xml:
+              - text/xml
+              - application/xml
+    urlmapping:
+        cache:
+            maxsize: 1000
+    controllers:
+        defaultScope: singleton
+    converters:
+        encoding: UTF-8
+    views:
+        default:
+            codec: html
+        gsp:
+            encoding: UTF-8
+            htmlcodec: xml
+            codecs:
+                expression: html
+                scriptlets: html
+                taglib: none
+                staticparts: none
+endpoints:
+    jmx:
+        unique-names: true
+
+# server自定义参数区域
+fetchMinute: 60 # fetch every 10 minutes
+preFetchMinute: 2 # 查询job提前查询几分钟的数据
+soundURL: pushsound.aif
