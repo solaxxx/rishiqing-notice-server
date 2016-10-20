@@ -38,11 +38,15 @@ class DateUtil {
         if(matcher.getCount() >0) return  true
         return false
     }
-    public static void main (String [] args) {
-        println(DateUtil.clockAlertMatch('10:13-PM-1'))
-        def dsf= clockFormatToHour24('3:19')
-        println(dsf)
+
+    static def getDay() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.SECOND,0);
+        calendar.set(Calendar.MINUTE,0);
+        return calendar
     }
+
     static def minuteMatch (String date) {
         def ma = /[0-2][0-9]\:[0-5][0-9]/;
         def matcher = (date =~ ma);
@@ -81,6 +85,8 @@ class DateUtil {
         String minutes = date.format('HH:mm')
         return minutes
     }
+
+
 
     static def hour24To12 (String date) {
         if (!minuteMatch(date))  return null

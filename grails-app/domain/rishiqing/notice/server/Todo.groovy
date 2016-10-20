@@ -9,9 +9,20 @@ class Todo {
     Date endDate
     Date startDate
     String dates
+    boolean pIsDone
+    boolean isDeleted
+    boolean isArchived
 
 
     static constraints = {
+    }
+
+    //  当前的日程是否已关闭提醒
+     def isAlertClose () {
+        if (!this.clockAlert) return true;
+        String [] args = this.clockAlert.split('-')
+        String toggle = args[2]
+        return toggle == "1" ? false : true
     }
 
     def toMap () {

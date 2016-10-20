@@ -69,8 +69,17 @@ class DataStore {
         String date1 = new Date().format('HH:mm')
         String date2 = DateUtil.clockFormatToHour24(todo.clockAlert)
         if (!DateUtil.inRange(date1, date2, preFetchMinute)) return false
-        def todoMap = this.getTodoMap(date2)
-        todoMap[todo.id] = todo
+        Map todoMap = this.getTodoMap(date2) // 查询某个时间点下的所有日程 key:21:03
+        Todo existTodo = todoMap[todo.id]
+        // 判断日程如果是 “已完成” “已删除” “已归档”“已关闭提醒” 则从数据仓库中剔除
+        boolean isRemove = todo.pIsDone ||  todo.isDeleted || todo.isArchived || todo.isAlertClose()
+        if (existTodo && isRemove) { // 如果日程已存在数据仓库中
+            todoMap.remove(existTodo)
+        } else if (existTodo && !isRemove) { // 如果不存在数据仓库中
+            todoMap[todo.id] = todo
+        } else if (!existTodo && !isRemove) {
+            todoMap[todo.id] = todo
+        }
         return true
     }
 }

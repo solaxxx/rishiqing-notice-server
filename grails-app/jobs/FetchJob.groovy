@@ -72,6 +72,9 @@ class FetchJob {
                 }
             }
             eq('clockAlert', clockAlert)
+            eq('pIsDone', false)
+            eq("isDeleted", false)
+            eq("isArchived", false)
         }
         return todoList
     }
@@ -91,6 +94,9 @@ class FetchJob {
                 }
             }
             eq('clockAlert', clockAlert)
+            eq('pIsDone', false)
+            eq("isDeleted", false)
+            eq("isArchived", false)
         }
         return count
     }
@@ -105,7 +111,7 @@ class FetchJob {
     void getDay2 () {
         Calendar nowTime = Calendar.getInstance();
         nowTime.add(Calendar.MINUTE, grailsApplication.config.preFetchMinute);
-        date    =  nowTime.getTime()
+        date    =  DateUtil.getDay().getTime()
         dateStr = date.format('yyyyMMdd')
         minutes = DateUtil.getClockFormat(nowTime)
         clockAlert =  minutes + '-1'

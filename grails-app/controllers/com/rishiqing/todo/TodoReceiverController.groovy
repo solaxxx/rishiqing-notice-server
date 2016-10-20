@@ -17,7 +17,6 @@ class TodoReceiverController {
     // http://localhost:8080/todoReceiver/index
     def index() {
         def ss = dataStore.getDataStore()
-        println(dataStore.getDataStore().size())
         render "dataStore length: " + dataStore.getDataStore().size()
     }
     // http://localhost:8080/todoReceiver/receive?id=3
@@ -54,8 +53,8 @@ class TodoReceiverController {
             render (status: 412, text: 'clock miss match')
             return
         }
-        dataStore.setReceiverTodoMap(todo, grailsApplication.config.preFetchMinute)
-        render (status: 200, text: 'success')
+        boolean result = dataStore.setReceiverTodoMap(todo, grailsApplication.config.preFetchMinute)
+        render (status: 200, text: result? 'success' : 'fail' )
         return
     }
 
