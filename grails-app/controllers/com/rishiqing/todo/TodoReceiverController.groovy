@@ -59,9 +59,12 @@ class TodoReceiverController {
     }
 
     public static void main (String [] args) {
-        println(DateUtil.clockAlertMatch('30:13'))
-        println(DateUtil.clockAlertMatch('1:13'))
-        println(DateUtil.clockAlertMatch('10:13-PM'))
-        println(DateUtil.clockAlertMatch('10:13-PM-1'))
+        def push = PushCenter.createFactory()
+        PushBean pushBean = new PushBean('我的测试xiaomi', "sss")
+        pushBean.targetValue = '282'
+        pushBean.soundURL = 'pushsound'
+        pushBean.addExtra('sss',11)
+        pushBean.addExtra('ddd',22)
+        push.notice.push(pushBean)
     }
 }

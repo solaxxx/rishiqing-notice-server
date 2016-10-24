@@ -53,8 +53,10 @@ class SendJob {
         PushBean pushBean = new PushBean(todo.pTitle, todo.pNote)
         pushBean.setTargetValue(todo.pUserId)
         pushBean.setSoundURL(grailsApplication.config.soundURL)
-        pushBean.addExtra('hrefA', todo.id)
+        pushBean.addExtra('hrefB', todo.pContainer)
+        pushBean.addExtra('hrefC', todo.id)
         pushBean.addExtra('messageType', 100) // 闹钟提醒
+        pushBean.addExtra('alertTime', minutes) // 提醒时间
         push.notice.push(pushBean)
     }
     /**
