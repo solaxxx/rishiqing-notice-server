@@ -37,6 +37,9 @@ class DataStore {
     def getDataStore () {
         return dataStore
     }
+    def getDataStoreIndex () {
+        return dataStoreIndex
+    }
 
     // set
     def setDataStore (String key, Map todoMap) {
@@ -69,7 +72,7 @@ class DataStore {
     }
 
     def setRTodoMap (Todo todo) {
-        if (!todo || todo.isDeleted || todo.isArchived || todo.pIsDone && !checkTodayAlert(todo)) return false
+        if (!todo || todo.isDeleted || todo.isArchived || todo.pIsDone || !checkTodayAlert(todo)) return false
         // 当前分钟数
 //        String date1 = new Date().format('HH:mm')
         // 日程的提醒时间

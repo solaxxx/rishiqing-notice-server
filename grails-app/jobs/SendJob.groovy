@@ -35,6 +35,7 @@ class SendJob {
                     try {
                         def todo = it.value
                         pushMessage(todo)  //  发送推送
+                        dataStore.getDataStoreIndex().remove(todo.id)
                         println('向userId为 ' + todo.pUserId +  ' 的用户发送了提醒,id:' + todo.id + '标题是:' + todo.getRealPTitle())
                     } catch (Exception e) {
                         e.printStackTrace()
