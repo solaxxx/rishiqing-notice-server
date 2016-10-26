@@ -13,9 +13,10 @@ class Todo {
     boolean pIsDone
     boolean isDeleted
     boolean isArchived
+    Boolean isChangeDate = false
 
-    static constraints = {
-    }
+
+    static belongsTo = [todoDeploy: TodoDeploy,kanbanItem: KanbanItem]
 
     //  当前的日程是否已关闭提醒
      def isAlertClose () {
@@ -33,4 +34,10 @@ class Todo {
                 clockAlert : this.clockAlert
         ]
     }
+
+    def getRealPTitle(){return this.todoDeploy?this.todoDeploy.pTitle:this.pTitle}
+    def getRealPNote(){return this.todoDeploy?this.todoDeploy.pNote:this.pNote}
+    def getRealStartDate(){return this.kanbanItem&&!this.isChangeDate&&this.todoDeploy?this.todoDeploy.startDate:this.endDate}
+    def getRealEndDate(){return this.kanbanItem&&!this.isChangeDate&&this.todoDeploy?this.todoDeploy.endDate:this.endDate}
+    def getRealDates(){return this.kanbanItem&&!this.isChangeDate&&this.todoDeploy?this.todoDeploy.dates:this.dates}
 }
