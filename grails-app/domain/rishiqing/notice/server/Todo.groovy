@@ -14,7 +14,6 @@ class Todo {
     boolean isDeleted
     boolean isArchived
 
-
     static constraints = {
     }
 

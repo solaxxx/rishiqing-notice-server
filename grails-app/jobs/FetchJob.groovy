@@ -70,6 +70,12 @@ class FetchJob {
                 and {
                     like('dates', '%'+ dateStr + '%')
                 }
+                and {
+                    or {
+                        sqlRestriction('right(dates,8) < ' + dateStr)
+                        gt("endDate",   date)
+                    }
+                }
             }
             eq('clockAlert', clockAlert)
             eq('pIsDone', false)
@@ -91,6 +97,12 @@ class FetchJob {
                 }
                 and {
                     like('dates', '%'+ dateStr + '%')
+                }
+                and {
+                    or {
+                        sqlRestriction('right(dates,8) < ' + dateStr)
+                        gt("endDate",   date)
+                    }
                 }
             }
             eq('clockAlert', clockAlert)
