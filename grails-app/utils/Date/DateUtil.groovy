@@ -105,4 +105,30 @@ class DateUtil {
     static def formatHour (String hour) {
 
     }
+
+    static Date getMaxDate(String dates){
+        if(!dates){
+            return null
+        }
+        String[] str = dates.split(",")
+        Date maxDate = Date.parse("yyyyMMdd",str[0])
+        for(int i=1;i<str.length;i++){
+            Date d = Date.parse("yyyyMMdd",str[i])
+            maxDate = maxDate.getTime()>=d.getTime()?maxDate:d
+        }
+        return maxDate
+    }
+
+    static Date getMinDate(String dates){
+        if(!dates){
+            return null
+        }
+        String[] str = dates.split(",")
+        Date minDate = Date.parse("yyyyMMdd",str[0])
+        for(int i=1;i<str.length;i++){
+            Date d = Date.parse("yyyyMMdd",str[i])
+            minDate = minDate.getTime()<=d.getTime()?minDate:d
+        }
+        return minDate
+    }
 }
