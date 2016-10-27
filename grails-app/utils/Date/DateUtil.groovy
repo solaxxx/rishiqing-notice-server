@@ -74,9 +74,6 @@ class DateUtil {
     static def clockFormatToHour24 (String clockAlert) {
         if (!clockAlert) return null
         String [] args = clockAlert.split('-')
-        String o  = args[2]
-        //开关为关闭状态则不放入仓库
-        if("0".equals(o)) return null
         String [] hm = args[0].split(':')
         String h  = hm[0]
         String m  = hm[1]
