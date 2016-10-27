@@ -72,8 +72,11 @@ class DateUtil {
     // 13:00
     // 23:59
     static def clockFormatToHour24 (String clockAlert) {
-        if (!clockAlert) return;
+        if (!clockAlert) return null
         String [] args = clockAlert.split('-')
+        String o  = args[2]
+        //开关为关闭状态则不放入仓库
+        if("0".equals(o)) return null
         String [] hm = args[0].split(':')
         String h  = hm[0]
         String m  = hm[1]
@@ -84,6 +87,13 @@ class DateUtil {
         Date date    =  calendar.getTime()
         String minutes = date.format('HH:mm')
         return minutes
+    }
+
+    static Boolean isOpenClock(String clockAlert){
+        if (!clockAlert) return false
+        String [] args = clockAlert.split('-')
+        String o  = args[2]
+        return "1".equals(o)
     }
 
 

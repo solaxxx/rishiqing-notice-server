@@ -47,7 +47,8 @@ class FetchJob {
                     def list   = getResult(offset)
                     // 存储进dataStore中
                     list.each { it->
-                        dataStore.setTodoMap(m, it)
+                        //开关打开才会添加到仓库中
+                        if(DateUtil.isOpenClock(it.clockAlert)) dataStore.setTodoMap(m, it)
                     }
                 }
                 Date end = now
