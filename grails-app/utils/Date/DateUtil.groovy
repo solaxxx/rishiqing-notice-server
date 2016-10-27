@@ -60,7 +60,7 @@ class DateUtil {
     }
 
     // 9:00-AM
-    // 11:00-PM
+    //  11:00-PM
     static def getClockFormat (Calendar calender) {
         Date date = calender.getTime()
         int h = calender.get(Calendar.HOUR)
