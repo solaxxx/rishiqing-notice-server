@@ -60,7 +60,7 @@ class DateUtil {
     }
 
     // 9:00-AM
-    // 11:00-PM
+    //  11:00-PM
     static def getClockFormat (Calendar calender) {
         Date date = calender.getTime()
         int h = calender.get(Calendar.HOUR)
@@ -74,9 +74,6 @@ class DateUtil {
     static def clockFormatToHour24 (String clockAlert) {
         if (!clockAlert) return null
         String [] args = clockAlert.split('-')
-        String o  = args[2]
-        //开关为关闭状态则不放入仓库
-        if("0".equals(o)) return null
         String [] hm = args[0].split(':')
         String h  = hm[0]
         String m  = hm[1]
