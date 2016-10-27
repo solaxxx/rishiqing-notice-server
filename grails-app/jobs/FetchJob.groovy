@@ -108,6 +108,7 @@ class FetchJob {
                 eq('pIsDone', false)
                 eq("isDeleted", false)
                 eq("isArchived", false)
+                eq("isRepeatTodo", false)
             }
         }
         return todoList
@@ -161,6 +162,7 @@ class FetchJob {
                 eq('pIsDone', false)
                 eq("isDeleted", false)
                 eq("isArchived", false)
+                eq("isRepeatTodo", false)
             }
         }
         return count

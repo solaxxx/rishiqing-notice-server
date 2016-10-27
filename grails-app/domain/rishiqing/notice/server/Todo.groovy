@@ -14,6 +14,7 @@ class Todo {
     boolean isDeleted
     boolean isArchived
     Boolean isChangeDate = false
+    Boolean isRepeatTodo = false
 
 
     static belongsTo = [todoDeploy: TodoDeploy,kanbanItem: KanbanItem]
