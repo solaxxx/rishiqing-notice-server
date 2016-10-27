@@ -124,7 +124,7 @@ class DataStore {
         // 日程的提醒时间
         String date2 = DateUtil.clockFormatToHour24(todo.clockAlert)
         // 当提醒时间和当前分钟数差值大于X分钟后，才会被记录到数据仓库中
-        if(!date2) return false
+        if(!date2 || !DateUtil.isOpenClock(todo.clockAlert)) return false
         if (!DateUtil.inRange(date1, date2, preFetchMinute)) return false
         setRTodoMap(todo)
         return true
