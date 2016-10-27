@@ -12,8 +12,6 @@ buildscript {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.8.2"
         classpath "org.grails.plugins:hibernate4:5.0.5"
         classpath 'org.grails.plugins:quartz:2.0.9'
-        classpath 'com.aliyun:aliyun-java-sdk-push:2.2.1'
-        classpath 'com.aliyun:aliyun-java-sdk-core:2.4.2'
     }
 }
 
