@@ -13,7 +13,7 @@ class ThreadPoolUtil {
      * @return
      */
     static def executeTread(Runnable runnable){
-        ThreadPoolExecutor threadPool =  GetThreadPool.getInstance()
+        ThreadPoolExecutor threadPool =  ThreadPool.getInstance()
         threadPool.execute(runnable)
     }
 }
