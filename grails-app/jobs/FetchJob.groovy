@@ -48,7 +48,11 @@ class FetchJob {
                     // 存储进dataStore中
                     list.each { it->
                         //开关打开才会添加到仓库中
-                        if(DateUtil.isOpenClock(it.clockAlert)) dataStore.setTodoMap(m, it)
+                        if(DateUtil.isOpenClock(it.clockAlert)){
+                            it.insertDate = new Date()
+                            it.type = "fetchJob"
+                            dataStore.setTodoMap(m, it)
+                        }
                     }
                 }
                 Date end = now
@@ -67,45 +71,47 @@ class FetchJob {
     def getResult (def offset) {
         List<Todo> todoList = Todo.createCriteria().list(offset:offset,max:max){
             and{
-                createAlias("todoDeploy","d",1)
                 or{
-                    //没有来自看板
                     and{
-                        isNull("kanbanItem")
+                        createAlias("todoDeploy","d",1)
                         or{
+                            //没有来自看板
                             and{
-                                le("startDate", today)
-                                isNull("dates")
-                            }
-                            sqlRestriction('right(this_.dates,8) < ' + dateStr)
-                            like('dates', '%'+ dateStr + '%')
-                        }
-                    }
-                    //来自看板
-                    and{
-                        isNotNull("kanbanItem")
-                        eq("isChangeDate", false)
-                        or{
-                            and{
-                                isNotNull("d.startDate")
-                                isNotNull("d.endDate")
-                                le("d.startDate", today)
-                                isNull("d.dates")
-                            }
-                            and{
-                                isNotNull("d.dates")
+                                isNull("kanbanItem")
                                 or{
-                                    sqlRestriction('right(d1_.dates,8) < ' + dateStr)
-                                    like('d.dates', '%'+ dateStr + '%')
+                                    and{
+                                        le("startDate", today)
+                                        isNull("dates")
+                                    }
+                                    sqlRestriction('right(this_.dates,8) < ' + dateStr)
+                                    like('dates', '%'+ dateStr + '%')
+                                }
+                            }
+                            //来自看板
+                            and{
+                                isNotNull("kanbanItem")
+                                eq("isChangeDate", false)
+                                or{
+                                    and{
+                                        isNotNull("d.startDate")
+                                        isNotNull("d.endDate")
+                                        le("d.startDate", today)
+                                        isNull("d.dates")
+                                    }
+                                    and{
+                                        isNotNull("d.dates")
+                                        or{
+                                            sqlRestriction('right(d1_.dates,8) < ' + dateStr)
+                                            like('d.dates', '%'+ dateStr + '%')
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
+                    eq("pContainer", "inbox")
                 }
-                or{
-                    eq('clockAlert', clockAlert)
-                    eq('clockAlert', "0${clockAlert}")
-                }
+                eq('clockAlert', clockAlert)
                 eq('pIsDone', false)
                 eq("isDeleted", false)
                 eq("isArchived", false)
@@ -121,45 +127,47 @@ class FetchJob {
     def getCount () {
         def count = Todo.createCriteria().count{
             and{
-                createAlias("todoDeploy","d",1)
                 or{
-                    //没有来自看板
                     and{
-                        isNull("kanbanItem")
+                        createAlias("todoDeploy","d",1)
                         or{
+                            //没有来自看板
                             and{
-                                le("startDate", today)
-                                isNull("dates")
-                            }
-                            sqlRestriction('right(this_.dates,8) < ' + dateStr)
-                            like('dates', '%'+ dateStr + '%')
-                        }
-                    }
-                    //来自看板
-                    and{
-                        isNotNull("kanbanItem")
-                        eq("isChangeDate", false)
-                        or{
-                            and{
-                                isNotNull("d.startDate")
-                                isNotNull("d.endDate")
-                                le("d.startDate", today)
-                                isNull("d.dates")
-                            }
-                            and{
-                                isNotNull("d.dates")
+                                isNull("kanbanItem")
                                 or{
-                                    sqlRestriction('right(d1_.dates,8) < ' + dateStr)
-                                    like('d.dates', '%'+ dateStr + '%')
+                                    and{
+                                        le("startDate", today)
+                                        isNull("dates")
+                                    }
+                                    sqlRestriction('right(this_.dates,8) < ' + dateStr)
+                                    like('dates', '%'+ dateStr + '%')
+                                }
+                            }
+                            //来自看板
+                            and{
+                                isNotNull("kanbanItem")
+                                eq("isChangeDate", false)
+                                or{
+                                    and{
+                                        isNotNull("d.startDate")
+                                        isNotNull("d.endDate")
+                                        le("d.startDate", today)
+                                        isNull("d.dates")
+                                    }
+                                    and{
+                                        isNotNull("d.dates")
+                                        or{
+                                            sqlRestriction('right(d1_.dates,8) < ' + dateStr)
+                                            like('d.dates', '%'+ dateStr + '%')
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
+                    eq("pContainer", "inbox")
                 }
-                or{
-                    eq('clockAlert', clockAlert)
-                    eq('clockAlert', "0${clockAlert}")
-                }
+                eq('clockAlert', clockAlert)
                 eq('pIsDone', false)
                 eq("isDeleted", false)
                 eq("isArchived", false)

@@ -49,6 +49,8 @@ class TodoReceiverController {
             render (status: 412, text: 'todo not found')
             return
         }
+        todo.insertDate = new Date()
+        todo.type = "call"
         if (!DateUtil.clockAlertMatch(todo.clockAlert)) {
             render (status: 412, text: 'clock miss match')
             return

@@ -2,6 +2,9 @@ package rishiqing.notice.server
 
 class Todo {
 
+    transient Date insertDate
+    transient String type
+
     String pTitle // 待办事项名称
     String pNote  // 待办事项备注
     String clockAlert
@@ -29,10 +32,21 @@ class Todo {
 
     def toMap () {
         return [
-                pTitle  :  this.pTitle,
-                pNote   :  this.pNote,
-                pUserId :  this.pUserId,
-                clockAlert : this.clockAlert
+                pTitle:  this.getRealPTitle(),
+                PNote:  this.getRealPNote(),
+                pUserId:  this.pUserId,
+                clockAlert: this.clockAlert,
+                startDate: this.startDate?.format("yyyy-MM-dd HH:mm:ss"),
+                endDate: this.endDate?.format("yyyy-MM-dd HH:mm:ss"),
+                dates: this.dates,
+                pContainer: this.pContainer,
+                pIsDone: this.pIsDone,
+                isDeleted: this.isDeleted,
+                isArchived: this.isArchived,
+                isChangeDate: this.isChangeDate,
+                isRepeatTodo: this.isRepeatTodo,
+                insertDate: this.insertDate?.format("yyyy-MM-dd HH:mm:ss"),
+                type: this.type
         ]
     }
 
