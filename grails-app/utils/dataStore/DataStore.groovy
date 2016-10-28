@@ -72,7 +72,8 @@ class DataStore {
     }
 
     def setRTodoMap (Todo todo) {
-        if (!todo || todo.isDeleted || todo.isArchived || todo.pIsDone || todo.isRepeatTodo || !checkTodayAlert(todo)) return false
+        if (!todo || todo.isDeleted || todo.isArchived || todo.pIsDone) return false
+        if (!"inbox".equals(todo.pContainer) && (todo.isRepeatTodo || !checkTodayAlert(todo))) return false
         // 当前分钟数
 //        String date1 = new Date().format('HH:mm')
         // 日程的提醒时间

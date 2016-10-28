@@ -3,6 +3,7 @@ import com.rishiqing.base.push.PushBean
 import dataStore.DataStore
 import grails.core.GrailsApplication
 import rishiqing.notice.server.Todo
+import threadPool.ThreadPool
 import threadPool.ThreadPoolUtil
 
 /**
@@ -52,7 +53,7 @@ class SendJob {
      void pushMessage (Todo todo) {
         PushCenter.setConfigRootPath('push')
          /************************移动端推送***************************/
-        def push = PushCenter.createFactory()
+        def push = PushCenter.createFactory(ThreadPool.getInstance())
          // 设置推送类型
         push.addAndroidPush(PushCenter.MI_PUSH)
         push.addAndroidPush(PushCenter.J_PUSH)
@@ -60,7 +61,7 @@ class SendJob {
         push.addIosPush(PushCenter.J_PUSH)
         push.addIosPush(PushCenter.MI_PUSH)
         // 设置推送内容
-        PushBean pushBean = new PushBean(todo.getRealPTitle(), todo.getRealPNote())
+        PushBean pushBean = new PushBean(todo.getRealPTitle(), todo.getRealPNote()?:"")
         pushBean.setTargetValue(todo.pUserId)
         pushBean.setSoundURL(grailsApplication.config.soundURL)
         pushBean.addExtra('hrefB', todo.pContainer)
@@ -69,7 +70,7 @@ class SendJob {
         pushBean.addExtra('alertTime', minutes) // 提醒时间
         push.notice.push(pushBean)
         /************************web端推送***************************/
-         def webPush = PushCenter.createFactory(PushCenter.WEB)
+         def webPush = PushCenter.createFactory(PushCenter.WEB,ThreadPool.getInstance())
          webPush.webPush('userId' + todo.pUserId, 'todoAlert',
                  [pTitle:todo.pTitle, id:todo.id, clock:minutes])
     }
