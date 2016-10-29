@@ -51,6 +51,7 @@ class SendJob {
 
 
      void pushMessage (Todo todo) {
+        String pTitle = todo.getRealPTitle()
         PushCenter.setConfigRootPath('push')
          /************************移动端推送***************************/
         def push = PushCenter.createFactory(ThreadPool.getInstance())
@@ -61,7 +62,7 @@ class SendJob {
         push.addIosPush(PushCenter.J_PUSH)
         push.addIosPush(PushCenter.MI_PUSH)
         // 设置推送内容
-        PushBean pushBean = new PushBean(todo.getRealPTitle(), "日事清-工作计划")
+        PushBean pushBean = new PushBean(pTitle, "日事清-工作计划")
         pushBean.setTargetValue(todo.pUserId)
         pushBean.setSoundURL(grailsApplication.config.soundURL)
         pushBean.addExtra('hrefB', todo.pContainer)
@@ -72,7 +73,7 @@ class SendJob {
         /************************web端推送***************************/
          def webPush = PushCenter.createFactory(PushCenter.WEB,ThreadPool.getInstance())
          webPush.webPush('userId' + todo.pUserId, 'todoAlert',
-                 [pTitle:todo.pTitle, id:todo.id, clock:minutes])
+                 [pTitle:pTitle, id:todo.id, clock:minutes])
     }
     /**
      * 数据处理
