@@ -37,7 +37,7 @@ class SendJob {
                         def todo = it.value
                         pushMessage(todo)  //  发送推送
                         dataStore.getDataStoreIndex().remove(todo.id)
-                        println('向userId为 ' + todo.pUserId +  ' 的用户发送了提醒,id:' + todo.id + '标题是:' + todo.getRealPTitle())
+                        // println('向userId为 ' + todo.pUserId +  ' 的用户发送了提醒,id:' + todo.id + '标题是:' + todo.getRealPTitle())
                     } catch (Exception e) {
                         e.printStackTrace()
                     }
@@ -61,7 +61,7 @@ class SendJob {
         push.addIosPush(PushCenter.J_PUSH)
         push.addIosPush(PushCenter.MI_PUSH)
         // 设置推送内容
-        PushBean pushBean = new PushBean(todo.getRealPTitle(), todo.getRealPNote()?:"")
+        PushBean pushBean = new PushBean(todo.getRealPTitle(), "日事清-工作计划")
         pushBean.setTargetValue(todo.pUserId)
         pushBean.setSoundURL(grailsApplication.config.soundURL)
         pushBean.addExtra('hrefB', todo.pContainer)
