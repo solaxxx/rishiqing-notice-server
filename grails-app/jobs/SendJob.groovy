@@ -1,5 +1,6 @@
 import com.rishiqing.PushCenter
 import com.rishiqing.base.push.PushBean
+import com.xiaomi.xmpush.server.Constants
 import dataStore.DataStore
 import grails.core.GrailsApplication
 import rishiqing.notice.server.Todo
@@ -69,6 +70,8 @@ class SendJob {
         pushBean.addExtra('hrefC', todo.id)
         pushBean.addExtra('messageType', 100) // 闹钟提醒
         pushBean.addExtra('alertTime', minutes) // 提醒时间
+
+        pushBean.addExtra(Constants.EXTRA_PARAM_SOUND_URI, grailsApplication.config.androidSoundURL) // 提醒时间
         push.notice.push(pushBean)
         /************************web端推送***************************/
          def webPush = PushCenter.createFactory(PushCenter.WEB,ThreadPool.getInstance())
