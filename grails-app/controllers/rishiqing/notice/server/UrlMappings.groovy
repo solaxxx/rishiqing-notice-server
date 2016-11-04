@@ -12,5 +12,10 @@ class UrlMappings {
         "/"(view:"/index")
         "500"(view:'/error')
         "404"(view:'/notFound')
+
+        "/dataStore/getDetail" (controller: "dataStore", action: "getDetail")
+        "/dataStore/$id?" (controller: "dataStore", parseRequest: true){
+            action = [GET: "show"]
+        }
     }
 }

@@ -19,7 +19,7 @@ class DateUtil {
 
     static def inRange (String date1, String date2, int maxRange) {
         int range = calculateMinute(date1, date2);
-        if (range <= maxRange) return  true
+        if (0<=range && range <= maxRange) return  true
         return false
     }
 
@@ -27,13 +27,13 @@ class DateUtil {
         def dateStr =  new Date ().format('yyyy-MM-dd')
         Date day1   =  parseDate( dateStr + ' ' + date1, 'yyyy-MM-dd HH:mm')
         Date day2   =  parseDate( dateStr + ' ' + date2, 'yyyy-MM-dd HH:mm')
-        def range  =   Math.abs(day1.getTime() - day2.getTime())
+        def range  =   day2.getTime() - day1.getTime()
         int range_minute =  range / 1000 / 60
         return range_minute
     }
     // 10:13-PM-1
     static def clockAlertMatch (String date) {
-        def ma =/(?:1[01]|[1-9]):[0-5][0-9]-(PM|AM)-(0|1)$/
+        def ma =/([0-9]|10|11):[0-5][0-9]-(PM|AM)-(0|1)$/
         def matcher = (date =~ ma);
         if(matcher.getCount() >0) return  true
         return false
@@ -60,7 +60,7 @@ class DateUtil {
     }
 
     // 9:00-AM
-    // 11:00-PM
+    //  11:00-PM
     static def getClockFormat (Calendar calender) {
         Date date = calender.getTime()
         int h = calender.get(Calendar.HOUR)
@@ -72,7 +72,7 @@ class DateUtil {
     // 13:00
     // 23:59
     static def clockFormatToHour24 (String clockAlert) {
-        if (!clockAlert) return;
+        if (!clockAlert) return null
         String [] args = clockAlert.split('-')
         String [] hm = args[0].split(':')
         String h  = hm[0]
@@ -84,6 +84,13 @@ class DateUtil {
         Date date    =  calendar.getTime()
         String minutes = date.format('HH:mm')
         return minutes
+    }
+
+    static Boolean isOpenClock(String clockAlert){
+        if (!clockAlert) return false
+        String [] args = clockAlert.split('-')
+        String o  = args[2]
+        return "1".equals(o)
     }
 
 
@@ -104,5 +111,31 @@ class DateUtil {
 
     static def formatHour (String hour) {
 
+    }
+
+    static Date getMaxDate(String dates){
+        if(!dates){
+            return null
+        }
+        String[] str = dates.split(",")
+        Date maxDate = Date.parse("yyyyMMdd",str[0])
+        for(int i=1;i<str.length;i++){
+            Date d = Date.parse("yyyyMMdd",str[i])
+            maxDate = maxDate.getTime()>=d.getTime()?maxDate:d
+        }
+        return maxDate
+    }
+
+    static Date getMinDate(String dates){
+        if(!dates){
+            return null
+        }
+        String[] str = dates.split(",")
+        Date minDate = Date.parse("yyyyMMdd",str[0])
+        for(int i=1;i<str.length;i++){
+            Date d = Date.parse("yyyyMMdd",str[i])
+            minDate = minDate.getTime()<=d.getTime()?minDate:d
+        }
+        return minDate
     }
 }

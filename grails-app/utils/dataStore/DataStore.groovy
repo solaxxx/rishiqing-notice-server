@@ -21,6 +21,8 @@ class DataStore {
     // 数据仓库
     private  def dataStore = [:]
 
+    private  def dataStoreIndex = [:]
+
     private DataStore () {}
 
     static def getInstance () {
@@ -34,6 +36,9 @@ class DataStore {
     // get
     def getDataStore () {
         return dataStore
+    }
+    def getDataStoreIndex () {
+        return dataStoreIndex
     }
 
     // set
@@ -49,8 +54,10 @@ class DataStore {
     }
 
     def setTodoMap (String dataStoreKey, Todo todo) {
+        todo.todoDeploy
         def todoMap = this.getTodoMap(dataStoreKey);
         todoMap[todo.id] = todo
+        dataStoreIndex[todo.id] = todo.clockAlert
     }
 
     def remove (key) {
@@ -64,64 +71,63 @@ class DataStore {
         }
     }
 
-    def setRTodoMap (Todo todo, int preFetchMinute) {
-        if (!todo) return false
+    def setRTodoMap (Todo todo) {
+        if (!todo || todo.isDeleted || todo.isArchived || todo.pIsDone) return false
+        if (!"inbox".equals(todo.pContainer) && (todo.isRepeatTodo || !checkTodayAlert(todo))) return false
         // 当前分钟数
-        String date1 = new Date().format('HH:mm')
+//        String date1 = new Date().format('HH:mm')
         // 日程的提醒时间
         String date2 = DateUtil.clockFormatToHour24(todo.clockAlert)
         // 查询某个时间点下的所有日程 date2:21:03
+        todo.todoDeploy
         Map todoMap  = this.getTodoMap(date2)
-        //  从数据仓库里获得该日程
-        Todo existTodo = todoMap[todo.id]
-        // 判断日程是否已存在于数据仓库中
-        if (existTodo) {
+        todoMap[todo.id] = todo
+        dataStoreIndex[todo.id] = todo.clockAlert
 
-        } else {
-
-        }
     }
 
     /**
      * 判断是否需要今天提醒
      */
     def checkTodayAlert (Todo todo) {
-        String dates = todo.dates  // 离散日期
-        String datesArgs = dates.split(',')
-        Date todoDay   = new Date()
-        Date startDate = todo.startDate, endDate = todo.endDate; // 范围日期
-        // 如果在时间段内
-        if ( !startDate.after(todoDay) && !endDate.before(todoDay)) {
-
-        } else if (true) { // 如果在离散时间内
-
-        } else if (true) { //如果属于延期任务
-
+        Date now = new Date()
+        String nowStr = now.format("yyyyMMdd")
+        String dates = todo.getRealDates()
+        Date startDate = todo.getRealStartDate()
+        if(dates){
+            /*
+            * 最大的时间小于当前时间则为延期
+            * dates包含了nowStr则一定会显示在今天
+            * */
+            return DateUtil.getMaxDate(dates).getTime()<now.getTime()||dates.split(",").contains(nowStr)
+        }else if(startDate){
+            //开始时间在今天之前的都会显示
+            return startDate.getTime()<=now.getTime()
         }
-
+        return false
     }
 
     def setReceiverTodoMap (Todo todo, int preFetchMinute) {
         if (!todo) return false
-        // 当前分钟数
+        //查看索引里之前是否已经保存该日程
+        String clockAlert = dataStoreIndex[todo.id]
+        if(clockAlert){
+            String date2 = DateUtil.clockFormatToHour24(clockAlert)
+            // 查询某个时间点下的所有日程 date2:21:03
+            Map todoMap  = this.getTodoMap(date2)
+            todoMap.remove(todo.id)
+            dataStoreIndex.remove(todo.id)
+        }
+
+
+        // 当前分钟数dsd
         String date1 = new Date().format('HH:mm')
         // 日程的提醒时间
         String date2 = DateUtil.clockFormatToHour24(todo.clockAlert)
         // 当提醒时间和当前分钟数差值大于X分钟后，才会被记录到数据仓库中
+        if(!date2 || !DateUtil.isOpenClock(todo.clockAlert)) return false
         if (!DateUtil.inRange(date1, date2, preFetchMinute)) return false
-        //  获得 HH:mm 这个分钟的日程map
-        Map todoMap = this.getTodoMap(date2) // 查询某个时间点下的所有日程 key:21:03
-        //  从数据仓库里获得该日程
-        Todo existTodo = todoMap[todo.id]
-        // 判断日程如果是 “已完成” “已删除” “已归档”“已关闭提醒” 则从数据仓库中剔除
-        boolean isRemove = todo.pIsDone ||  todo.isDeleted || todo.isArchived || todo.isAlertClose()
-        if (existTodo && isRemove) { // 如果日程已存在数据仓库中
-            todoMap.remove(existTodo)
-        } else if (existTodo && !isRemove) { // 如果不存在数据仓库中
-            todoMap[todo.id] = todo
-        } else if (!existTodo && !isRemove) {
-            todoMap[todo.id] = todo
-        }
+        setRTodoMap(todo)
         return true
     }
 }

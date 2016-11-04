@@ -1,8 +1,10 @@
 import com.rishiqing.PushCenter
 import com.rishiqing.base.push.PushBean
+import com.xiaomi.xmpush.server.Constants
 import dataStore.DataStore
 import grails.core.GrailsApplication
 import rishiqing.notice.server.Todo
+import threadPool.ThreadPool
 import threadPool.ThreadPoolUtil
 
 /**
@@ -35,7 +37,8 @@ class SendJob {
                     try {
                         def todo = it.value
                         pushMessage(todo)  //  发送推送
-                        println('向userId为 ' + todo.pUserId +  ' 的用户发送了提醒,id:' + todo.id + '标题是:' + todo.pTitle)
+                        dataStore.getDataStoreIndex().remove(todo.id)
+                        // println('向userId为 ' + todo.pUserId +  ' 的用户发送了提醒,id:' + todo.id + '标题是:' + todo.getRealPTitle())
                     } catch (Exception e) {
                         e.printStackTrace()
                     }
@@ -49,15 +52,31 @@ class SendJob {
 
 
      void pushMessage (Todo todo) {
-        def push = PushCenter.createFactory()
-        PushBean pushBean = new PushBean(todo.pTitle, todo.pNote)
+        String pTitle = todo.getRealPTitle()
+        PushCenter.setConfigRootPath('push')
+         /************************移动端推送***************************/
+        def push = PushCenter.createFactory(ThreadPool.getInstance())
+         // 设置推送类型
+        push.addAndroidPush(PushCenter.MI_PUSH)
+        push.addAndroidPush(PushCenter.J_PUSH)
+        push.addAndroidPush(PushCenter.ALI_PUSH)
+        push.addIosPush(PushCenter.J_PUSH)
+        push.addIosPush(PushCenter.MI_PUSH)
+        // 设置推送内容
+        PushBean pushBean = new PushBean(pTitle, "日事清-工作计划")
         pushBean.setTargetValue(todo.pUserId)
         pushBean.setSoundURL(grailsApplication.config.soundURL)
         pushBean.addExtra('hrefB', todo.pContainer)
         pushBean.addExtra('hrefC', todo.id)
         pushBean.addExtra('messageType', 100) // 闹钟提醒
         pushBean.addExtra('alertTime', minutes) // 提醒时间
+
+        pushBean.addExtra(Constants.EXTRA_PARAM_SOUND_URI, grailsApplication.config.androidSoundURL) // 提醒时间
         push.notice.push(pushBean)
+        /************************web端推送***************************/
+         def webPush = PushCenter.createFactory(PushCenter.WEB,ThreadPool.getInstance())
+         webPush.webPush('userId' + todo.pUserId, 'todoAlert',
+                 [pTitle:pTitle, id:todo.id, clock:minutes])
     }
     /**
      * 数据处理
