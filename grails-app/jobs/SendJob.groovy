@@ -59,10 +59,11 @@ class SendJob {
          // 设置推送类型
         push.addAndroidPush(PushCenter.MI_PUSH)
         push.addAndroidPush(PushCenter.J_PUSH)
-        push.addAndroidPush(PushCenter.ALI_PUSH)
+       // push.addAndroidPush(PushCenter.ALI_PUSH)
+        push.addAndroidPush(PushCenter.HW_PUSH)
         push.addIosPush(PushCenter.J_PUSH)
         push.addIosPush(PushCenter.MI_PUSH)
-        push.addIosPush(PushCenter.HW_PUSH)
+
         // 设置推送内容
         PushBean pushBean = new PushBean(pTitle, "日事清-工作计划")
         pushBean.setTargetValue(todo.pUserId)
