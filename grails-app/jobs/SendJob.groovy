@@ -52,7 +52,8 @@ class SendJob {
 
 
      void pushMessage (Todo todo) {
-        String pTitle = todo.getRealPTitle()
+        String t = todo.getRealPTitle()
+        String pTitle = t&&t.length()>20?t.substring(0,20):t
         PushCenter.setConfigRootPath('push')
          /************************移动端推送***************************/
         def push = PushCenter.createFactory(ThreadPool.getInstance())
@@ -65,13 +66,14 @@ class SendJob {
         push.addIosPush(PushCenter.MI_PUSH)
 
         // 设置推送内容
-        PushBean pushBean = new PushBean(pTitle, todo.getRealPNote())
+        PushBean pushBean = new PushBean(pTitle, todo.getRealPNote()?:"点击查看")
         pushBean.setTargetValue(todo.pUserId)
         pushBean.setSoundURL(grailsApplication.config.soundURL)
         pushBean.addExtra('hrefB', todo.pContainer)
         pushBean.addExtra('hrefC', todo.id)
         pushBean.addExtra('messageType', 100) // 闹钟提醒
         pushBean.addExtra('alertTime', minutes) // 提醒时间
+        pushBean.addExtra('pTitle', pTitle) // 提醒时间
 
         pushBean.addExtra(Constants.EXTRA_PARAM_SOUND_URI, grailsApplication.config.androidSoundURL) // 提醒时间
         push.notice.push(pushBean)
