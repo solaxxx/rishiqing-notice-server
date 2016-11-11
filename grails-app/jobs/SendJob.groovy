@@ -65,7 +65,7 @@ class SendJob {
         push.addIosPush(PushCenter.MI_PUSH)
 
         // 设置推送内容
-        PushBean pushBean = new PushBean(pTitle, "日事清-工作计划")
+        PushBean pushBean = new PushBean(pTitle, todo.getRealPNote())
         pushBean.setTargetValue(todo.pUserId)
         pushBean.setSoundURL(grailsApplication.config.soundURL)
         pushBean.addExtra('hrefB', todo.pContainer)
