@@ -61,7 +61,7 @@ class SendJob {
         push.addAndroidPush(PushCenter.MI_PUSH)
         push.addAndroidPush(PushCenter.J_PUSH)
        // push.addAndroidPush(PushCenter.ALI_PUSH)
-        push.addAndroidPush(PushCenter.HW_PUSH)
+//        push.addAndroidPush(PushCenter.HW_PUSH)
         push.addIosPush(PushCenter.J_PUSH)
         push.addIosPush(PushCenter.MI_PUSH)
 
