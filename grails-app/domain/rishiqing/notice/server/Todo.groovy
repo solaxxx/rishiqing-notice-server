@@ -10,6 +10,7 @@ class Todo {
     String clockAlert
     int pUserId
     Date endDate
+    Date pPlanedTime
     Date startDate
     String dates
     String pContainer
