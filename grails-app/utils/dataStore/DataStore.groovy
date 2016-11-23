@@ -103,6 +103,8 @@ class DataStore {
         }else if(startDate){
             //开始时间在今天之前的都会显示
             return startDate.getTime()<=now.getTime()
+        }else{
+            return todo.pPlanedTime&&todo.pPlanedTime.getTime()<=now.getTime()
         }
         return false
     }
