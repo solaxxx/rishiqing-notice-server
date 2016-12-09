@@ -53,7 +53,7 @@ class Todo {
 
     def getRealPTitle(){return this.todoDeploy?this.todoDeploy.pTitle:this.pTitle}
     def getRealPNote(){return this.todoDeploy?this.todoDeploy.pNote:this.pNote}
-    def getRealStartDate(){return this.kanbanItem&&!this.isChangeDate&&this.todoDeploy?this.todoDeploy.startDate:this.endDate}
+    def getRealStartDate(){return this.kanbanItem&&!this.isChangeDate&&this.todoDeploy?this.todoDeploy.startDate:this.startDate}
     def getRealEndDate(){return this.kanbanItem&&!this.isChangeDate&&this.todoDeploy?this.todoDeploy.endDate:this.endDate}
     def getRealDates(){return this.kanbanItem&&!this.isChangeDate&&this.todoDeploy?this.todoDeploy.dates:this.dates}
 }
