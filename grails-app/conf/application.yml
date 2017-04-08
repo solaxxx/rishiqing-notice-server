@@ -117,4 +117,4 @@ endpoints:
 fetchMinute: 60 # fetch every 10 minutes
 preFetchMinute: 2 # 查询job提前查询几分钟的数据
 soundURL: Umbriel.aiff
-androidSoundURL: android.resource://com.rishiqing/raw/alarm2"
+androidSoundURL: android.resource://com.rishiqing/raw/alarm2

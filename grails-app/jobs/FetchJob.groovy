@@ -24,9 +24,9 @@ class FetchJob {
 
     static String clockAlert = null
 
-    static Date now = new Date()
+    static Date now = null
 
-    static Date today = new Date().clearTime()
+    static Date today = null
 
     static triggers = {
       simple repeatInterval: 1000*60  // execute job once in 1 minute
@@ -82,6 +82,11 @@ class FetchJob {
                                     and{
                                         le("startDate", today)
                                         isNull("dates")
+                                    }
+                                    and{
+                                        isNull("dates")
+                                        isNull("startDate")
+                                        le("pPlanedTime", today)
                                     }
                                     sqlRestriction('right(this_.dates,8) < ' + dateStr)
                                     like('dates', '%'+ dateStr + '%')
@@ -139,6 +144,11 @@ class FetchJob {
                                         le("startDate", today)
                                         isNull("dates")
                                     }
+                                    and{
+                                        isNull("dates")
+                                        isNull("startDate")
+                                        le("pPlanedTime", today)
+                                    }
                                     sqlRestriction('right(this_.dates,8) < ' + dateStr)
                                     like('dates', '%'+ dateStr + '%')
                                 }
@@ -185,6 +195,8 @@ class FetchJob {
     }
 
     void getDay2 () {
+        now = new Date()
+        today = new Date().clearTime()
         Calendar nowTime = Calendar.getInstance();
         nowTime.add(Calendar.MINUTE, grailsApplication.config.preFetchMinute);
         date    =  DateUtil.getDay().getTime()
