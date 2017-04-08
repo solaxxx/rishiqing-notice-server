@@ -83,6 +83,11 @@ class FetchJob {
                                         le("startDate", today)
                                         isNull("dates")
                                     }
+                                    and{
+                                        isNull("dates")
+                                        isNull("startDate")
+                                        le("pPlanedTime", today)
+                                    }
                                     sqlRestriction('right(this_.dates,8) < ' + dateStr)
                                     like('dates', '%'+ dateStr + '%')
                                 }
@@ -138,6 +143,11 @@ class FetchJob {
                                     and{
                                         le("startDate", today)
                                         isNull("dates")
+                                    }
+                                    and{
+                                        isNull("dates")
+                                        isNull("startDate")
+                                        le("pPlanedTime", today)
                                     }
                                     sqlRestriction('right(this_.dates,8) < ' + dateStr)
                                     like('dates', '%'+ dateStr + '%')
