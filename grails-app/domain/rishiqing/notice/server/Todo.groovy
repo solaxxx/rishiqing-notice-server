@@ -20,7 +20,7 @@ class Todo {
     Boolean isChangeDate = false
     Boolean isRepeatTodo = false
 
-
+    static hasMany = [clocks: Clock]
     static belongsTo = [todoDeploy: TodoDeploy,kanbanItem: KanbanItem]
 
     //  当前的日程是否已关闭提醒
