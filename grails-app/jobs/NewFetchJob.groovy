@@ -157,10 +157,10 @@ class NewFetchJob {
                         }
                     }
                     Map<Long,Todo> alertTodos = alertStore.getTodoMap(dateKey);
-                    println dateKey +"\n"; // 提醒时间
+                    println "提醒时间 "+dateKey + "  已检索到提醒个数:" + alertTodos.size(); // 提醒时间
                     if(alertTodos){
                         alertTodos.entrySet().each { es -> // 提醒的日程
-                            println es.key + " --> 标题是:" + es.value.getRealPTitle() + "\n";
+                            println es.key + " --> 标题是:" + es.value.getRealPTitle();
                         }
                     }
 

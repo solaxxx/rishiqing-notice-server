@@ -63,7 +63,7 @@ class TodoReceiverController {
         return
     }
 
-    // http://beta.rishiqing.com/todoReceiver/pushAlert?alertTime="2017-01-01 23:30:00"&id=3&type="add"/"remove"
+    // http://192.168.31.14:8177/todoReceiver/pushAlert
     def pushAlert(){
         try{
             // 日程 id
@@ -81,9 +81,11 @@ class TodoReceiverController {
             if(Alert.ADD_ALERT.equals(type)){
                 // 添加到某个提醒里面
                 alertStore.addTodo(alertTimeStr,todo);
+                println "添加到 "+alertTimeStr + " --> 日程" + todo.id
             } else if(Alert.REMOVE_ALERT.equals(type)){
                 // 从某个提醒中移除
                 alertStore.removeTodo(alertTimeStr,todo);
+                println "删除 "+alertTimeStr + "中的 --> 日程 " + todo.id
             } else {
                 throw new Exception("type error ")
             }

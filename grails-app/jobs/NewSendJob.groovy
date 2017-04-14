@@ -74,6 +74,8 @@ class NewSendJob {
      *
      * */
     static triggers = {
+        // 服务器启动 1 分钟后开始运行
+        simple name: 'mySimpleTrigger', startDelay: 60000;
         // 使用 cron 表达式进行控制：每隔2分钟进行一次调度
 //        cron(name:"todoSendJob",cronExpression: "0 0/1 * * * ?");
         cron(name:"todoSendJob",cronExpression: "0 0/1 * * * ?");
@@ -125,11 +127,11 @@ class NewSendJob {
                             e.printStackTrace()
                         }
                     }
+                    // 控制台输出打印发送个数
+                    println('提醒时间 ' + dateKey + ', 已发送提醒个数:' + alertStore.getTodoMap(dateKey)?.size())
                     // 删除数据仓库索引中对应的实例
                     alertStore.removeDataStore(dateKey);
-                    println("移除dataStore中的实例:"+dateKey + "\n")
-                    // 控制台输出打印发送个数
-                    println('dateKey : ' + dateKey + ', dataStore after send remove length ' + alertStore.getTodoMap()?.size())
+                    println("移除dataStore中的实例:"+dateKey);
                 }
             })
         } catch (Exception e){
@@ -143,34 +145,36 @@ class NewSendJob {
      * @param todo
      */
     void pushMessage (Todo todo) {
-        String t = todo.getRealPTitle()
-        String pTitle = t&&t.length()>20?t.substring(0,20):t
-        PushCenter.setConfigRootPath('push')
-        /************************移动端推送***************************/
-        def push = PushCenter.createFactory(ThreadPool.getInstance())
-        // 设置推送类型
-        push.addAndroidPush(PushCenter.MI_PUSH)
-        push.addAndroidPush(PushCenter.J_PUSH)
-        // push.addAndroidPush(PushCenter.ALI_PUSH)
+        if(todo){
+            String t = todo.getRealPTitle()
+            String pTitle = t&&t.length()>20?t.substring(0,20):t
+            PushCenter.setConfigRootPath('push')
+            /************************移动端推送***************************/
+            def push = PushCenter.createFactory(ThreadPool.getInstance())
+            // 设置推送类型
+            push.addAndroidPush(PushCenter.MI_PUSH)
+            push.addAndroidPush(PushCenter.J_PUSH)
+            // push.addAndroidPush(PushCenter.ALI_PUSH)
 //        push.addAndroidPush(PushCenter.HW_PUSH)
-        push.addIosPush(PushCenter.J_PUSH)
-        push.addIosPush(PushCenter.MI_PUSH)
+            push.addIosPush(PushCenter.J_PUSH)
+            push.addIosPush(PushCenter.MI_PUSH)
 
-        // 设置推送内容
-        PushBean pushBean = new PushBean(pTitle, todo.getRealPNote()?:"点击查看")
-        pushBean.setTargetValue(todo.pUserId)
-        pushBean.setSoundURL(grailsApplication.config.soundURL)
-        pushBean.addExtra('hrefB', todo.pContainer)
-        pushBean.addExtra('hrefC', todo.id)
-        pushBean.addExtra('messageType', 100) // 闹钟提醒
-        pushBean.addExtra('alertTime', "21:21") // 提醒时间
-        pushBean.addExtra('pTitle', pTitle) // 提醒时间
+            // 设置推送内容
+            PushBean pushBean = new PushBean(pTitle, todo.getRealPNote()?:"点击查看")
+            pushBean.setTargetValue(todo.pUserId)
+            pushBean.setSoundURL(grailsApplication.config.soundURL)
+            pushBean.addExtra('hrefB', todo.pContainer)
+            pushBean.addExtra('hrefC', todo.id)
+            pushBean.addExtra('messageType', 100) // 闹钟提醒
+            pushBean.addExtra('alertTime', "21:21") // 提醒时间
+            pushBean.addExtra('pTitle', pTitle) // 提醒时间
 
-        pushBean.addExtra(Constants.EXTRA_PARAM_SOUND_URI, grailsApplication.config.androidSoundURL) // 提醒时间
-        push.notice.push(pushBean)
-        /************************web端推送***************************/
-        def webPush = PushCenter.createFactory(PushCenter.WEB,ThreadPool.getInstance())
-        webPush.webPush('userId' + todo.pUserId, 'todoAlert',
-                [pTitle:pTitle, id:todo.id, clock:"21:21"])
+            pushBean.addExtra(Constants.EXTRA_PARAM_SOUND_URI, grailsApplication.config.androidSoundURL) // 提醒时间
+            push.notice.push(pushBean)
+            /************************web端推送***************************/
+            def webPush = PushCenter.createFactory(PushCenter.WEB,ThreadPool.getInstance())
+            webPush.webPush('userId' + todo.pUserId, 'todoAlert',
+                    [pTitle:pTitle, id:todo.id, clock:"21:21"])
+        }
     }
 }
