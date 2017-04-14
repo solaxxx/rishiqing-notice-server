@@ -1,6 +1,7 @@
 import alertStore.AlertStore
 import groovy.sql.Sql
 import rishiqing.notice.server.Alert
+import rishiqing.notice.server.Clock
 import rishiqing.notice.server.Todo
 import threadPool.ThreadPoolUtil
 
@@ -10,15 +11,16 @@ import threadPool.ThreadPoolUtil
  */
 class NewFetchJob {
     transient static final Integer LATER_MINUTES = 1;
-    /** 数据仓库 */
+    /** 获取提醒仓库 */
     static AlertStore alertStore = AlertStore.getInstance();
     /** 查询数量 : 每次最多查询200条记录 */
-    static def max = 200;
+    static final def max = 200;
     /** 查询到下次要提醒的日程的时间 */
     static Date alertTime = null;
+    /** 非小时分钟秒的时间格式　*/
+    static Date taskDate = null;
     /** 字符格式的 alertTime */
-    static String alertTimeDates = null; // yyyyMMdd
-    static String alertTimeSimple = null; // yyyy-MM-dd 00:00:00
+    static String dates = null; // yyyyMMdd
     /** todoMap 的 键 */
     static String dateKey = null; // yyyy-MM-dd HH:mm:ss
     /** 触发器 */
@@ -44,11 +46,14 @@ class NewFetchJob {
         calendar.add(Calendar.MINUTE,LATER_MINUTES);
         // 提醒的时间
         alertTime = calendar.getTime();
+        // 为数据仓库设置提醒时间
+        AlertStore.alertTime = calendar.getTime();
         // 设置 alertTime 个字符串格式
-        alertTimeDates = alertTime.format("yyyyMMdd");
-        alertTimeSimple = alertTime.format("yyyy-MM-dd 00:00:00");
+        dates = alertTime.format("yyyyMMdd");
         // 设置键
         dateKey = alertTime.format("yyyy-MM-dd HH:mm:ss");
+        // 设置 taskDate
+        taskDate = new Date(alertTime.getTime()).clearTime();
     }
 
     /**
@@ -57,14 +62,14 @@ class NewFetchJob {
      * @return
      */
     def getAlertCount () {
-        Integer alertCount = Todo.createCriteria().count {
+        def alertCount = Todo.createCriteria().count {
             and{
                 or{
-                    like("dates","%${alertTimeDates}%")
+                    like("dates","%${dates}%")
                     and{
                         isNull("dates")
-                        le("startDate",alertTime)
-                        ge("endDate",alertTime)
+                        le("startDate",taskDate)
+                        ge("endDate",taskDate)
                     }
                 }
                 eq("isDeleted", false)
@@ -91,20 +96,22 @@ class NewFetchJob {
      * @return
      */
     def getResult (def offset) {
-        List<Todo> todoList = Todo.createCriteria().list(offset:offset,max:max) {
+        List<Todo> todoList = Todo.createCriteria().list(max:max,offset:offset) {
             and{
+                createAlias("todoDeploy","d",1)
                 or{
-                    like("dates","%${alertTimeDates}%") // 20170101
+                    like("dates","%${dates}%")
                     and{
                         isNull("dates")
-                        le("startDate",alertTime) // 小于等于 alertTime
-                        ge("endDate",alertTime)  // 大于等于 alertTime
+                        le("startDate",taskDate)
+                        ge("endDate",taskDate)
                     }
                 }
-                eq("isDeleted", false)  // 没有被删除的
-                eq("pIsDone", false) // 没有完成的
+                eq("isDeleted", false)
+                eq("pIsDone", false)
                 // 使用内链接查询
-                clocks{ // hasMany
+                clocks{
+                    eq("isDeleted",false)
                     alert{
                         eq("alertTime", alertTime)
                     }
@@ -123,7 +130,6 @@ class NewFetchJob {
             // 初始化基本时间
             initTime();
             def count = this.getAlertCount();
-            def list1 = getResult(100);
             // 获取偏移量
             /*
              * 比如 ：
@@ -143,13 +149,13 @@ class NewFetchJob {
                         def list = getResult(offset);
                         // 存储进dataStore中
                         list.each { todo ->
+                            todo.todoDeploy
                             //开关打开才会添加到仓库中
                             todo.insertDate = new Date();
                             todo.type = "newfetchJob";
                             alertStore.addTodo(dateKey,todo);
                         }
                     }
-                    // 遍历输出提醒的 todoMap 仓库
                     Map<Long,Todo> alertTodos = alertStore.getTodoMap(dateKey);
                     println dateKey +"\n"; // 提醒时间
                     if(alertTodos){

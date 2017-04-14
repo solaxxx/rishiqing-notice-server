@@ -51,6 +51,31 @@ class Todo {
         ]
     }
 
+//    // 改成这样的格式，看是否能解决懒加载问题。因为在提醒服务器中，todo 和 todoDeploy 和 kanbanItem 是无关联的。
+//    def getRealPTitle() {
+//        TodoDeploy dep = this.todoDeploy?TodoDeploy.findById(this.todoDeployId):null;
+//        return dep ? dep.pTitle : this.pTitle;
+//    }
+//    def getRealPNote(){
+//        TodoDeploy dep = this.todoDeploy?TodoDeploy.findById(this.todoDeployId):null;
+//        return dep? dep.pNote :this.pNote;
+//    }
+//    def getRealStartDate(){
+//        KanbanItem ki = this.kanbanItemId?KanbanItem.findById(this.kanbanItemId):null;
+//        TodoDeploy dep = this.todoDeploy?TodoDeploy.findById(this.todoDeployId):null;
+//        return ki&&!this.isChangeDate&&dep?dep.startDate:this.startDate
+//    }
+//    def getRealEndDate(){
+//        KanbanItem ki = this.kanbanItemId?KanbanItem.findById(this.kanbanItemId):null;
+//        TodoDeploy dep = this.todoDeploy?TodoDeploy.findById(this.todoDeployId):null;
+//        return ki&&!this.isChangeDate&&dep?dep.endDate:this.endDate
+//    }
+//    def getRealDates(){
+//        KanbanItem ki = this.kanbanItemId?KanbanItem.findById(this.kanbanItemId):null;
+//        TodoDeploy dep = this.todoDeploy?TodoDeploy.findById(this.todoDeployId):null;
+//        return ki&&!this.isChangeDate&&dep?dep.dates:this.dates
+//    }
+
     def getRealPTitle(){return this.todoDeploy?this.todoDeploy.pTitle:this.pTitle}
     def getRealPNote(){return this.todoDeploy?this.todoDeploy.pNote:this.pNote}
     def getRealStartDate(){return this.kanbanItem&&!this.isChangeDate&&this.todoDeploy?this.todoDeploy.startDate:this.startDate}

@@ -87,6 +87,7 @@ class TodoReceiverController {
             } else {
                 throw new Exception("type error ")
             }
+            return;
         } catch (Exception e){
             e.printStackTrace();
             return;

@@ -8,12 +8,11 @@ import rishiqing.notice.server.Todo
  * ["2017-01-01 15:30:00": {1:todo1 , 2:todo2 , 3:todo3 } ]
  */
 class AlertStore {
+    public static Date alertTime = null;
     /** 创建一个数据仓库（单例模式）*/
     private static AlertStore singleton = null
-    /** 日程列表 */
-    private Map<Long,Todo> todoMap = [:];
     /** 提醒映射 */
-    private Map<String,Map<Long,Todo>> alertStore = [:];
+    private Map<String,Map<Long,Todo>> dataStore = [:];
     /** 默认构造 */
     private AlertStore (){
     }
@@ -34,29 +33,40 @@ class AlertStore {
 
     /** 向 todoMap 中添加值*/
     public void addTodo(String key,Todo todo){
-        // 获取 todoMap
-        todoMap = this.getTodoMap(key);
-        // 向 todoMap 中添加日程
-        todoMap.put(todo.id,todo);
+        if(Date.parse("yyyy-MM-dd HH:mm:ss",key)>= alertTime){
+            // 获取 todoMap
+            def todoMap = this.getTodoMap(key);
+            // 向 todoMap 中添加日程
+            todoMap.put(todo.id,todo);
+        }
     }
     /** 通过key 获取数据库中的 todoMap */
     public Map<Long,Todo> getTodoMap(String key){
         // 查看对应的键值是否存在，存在则返回，不存在则创建
-        todoMap = alertStore.get(key)
+        def todoMap = dataStore.get(key)
         if(todoMap) {
             return todoMap;
         }
-        return alertStore.put(key,[:]);
+        dataStore.put(key,[:])
+        return dataStore.get(key);
     }
 
-    /** 从 alertStore 中移除 todoMap */
+    /** 从 dataStore 中移除 todoMap */
     public void removeTodoMap(String dateKey){
-        alertStore.remove(dateKey);
+        dataStore.remove(dateKey);
     }
 
     /** 从 todoMap 中移除值*/
     public void removeTodo(String key,Todo todo){
-        todoMap = alertStore.get(key);
-        todoMap.remove(todo.id);
+        def a = dataStore
+        def todoMap = dataStore.get(key);
+        if(todo && todoMap && todoMap.get(todo.id))
+            todoMap.remove(todo.id)
+
+    }
+
+    /** 移除当前时间的提醒 */
+    public void removeDataStore(String key){
+        dataStore.remove(key);
     }
 }

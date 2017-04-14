@@ -19,7 +19,7 @@ class NewSendJob {
     /** 查询到下次要提醒的日程的时间 */
     static Date alertTime = null;
     /** 字符格式的 alertTime */
-    static String alertTimeStr = null; // yyyyMMdd
+    static String dates = null; // yyyyMMdd
     /** todoMap 的 键 */
     static String dateKey = null; // yyyy-MM-dd HH:mm:ss
     /** 设置一个触发器 */
@@ -74,9 +74,8 @@ class NewSendJob {
      *
      * */
     static triggers = {
-        // 服务器启动后 1 分钟开始执行调度
-        simple(startDelay: 1000*60);
         // 使用 cron 表达式进行控制：每隔2分钟进行一次调度
+//        cron(name:"todoSendJob",cronExpression: "0 0/1 * * * ?");
         cron(name:"todoSendJob",cronExpression: "0 0/1 * * * ?");
     }
 
@@ -92,39 +91,51 @@ class NewSendJob {
         // 提醒的时间
         alertTime = calendar.getTime();
         // 设置 alertTime 个字符串格式
-        alertTimeStr = alertTime.format("yyyyMMdd");
+        dates = alertTime.format("yyyyMMdd");
         // 设置键
         dateKey = alertTime.format("yyyy-MM-dd HH:mm:ss");
     }
 
     /** 触发条件下直接执行 execute 方法　*/
     def execute() {
-        // 获取当前时间(为 dateStr 和 minutes 赋值)
-        initTime()
-        // 获取当前时间需要发送的提醒
-        def todoMap = alertStore.getTodoMap(dateKey);
-        // 启动线程
-        ThreadPoolUtil.executeTread(new Runnable() {
-            @Override
-            public void run() {
-                todoMap.each { it ->
-                    try {
-                        // 获取要提醒的日程
-                        def todo = it.value
-                        //  发送推送
-                        pushMessage(todo);
-                        // 控制台打印测试
-                        println('向userId为 ' + todo.pUserId +  ' 的用户发送了提醒,id:' + todo.id + '标题是:' + todo.getRealPTitle())
-                    } catch (Exception e) {
-                        e.printStackTrace()
+        try{
+            // 获取当前时间(为 dateStr 和 minutes 赋值)
+            initTime()
+            def a = alertTime;
+            def b = dates;
+            def c = dateKey;
+            Map<Long,Todo> alertTodos = alertStore.getTodoMap(dateKey);
+            // 获取当前时间需要发送的提醒
+            def todoMap = alertStore.getTodoMap(dateKey);
+            // 启动线程
+            ThreadPoolUtil.executeTread(new Runnable() {
+                @Override
+                public void run() {
+                    todoMap.each { it ->
+                        try {
+                            // 获取要提醒的日程
+                            def todo = it.value
+                            if(todo){
+                                //  发送推送
+                                pushMessage(todo);
+                                // 控制台打印测试
+                                println('向userId为 ' + todo.pUserId +  ' 的用户发送了提醒,id:' + todo.id + '标题是:' + todo.pTitle)
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace()
+                        }
                     }
+                    // 删除数据仓库索引中对应的实例
+                    alertStore.removeDataStore(dateKey);
+                    println("移除dataStore中的实例:"+dateKey + "\n")
+                    // 控制台输出打印发送个数
+                    println('dateKey : ' + dateKey + ', dataStore after send remove length ' + alertStore.getTodoMap()?.size())
                 }
-                // 删除数据仓库索引中对应的实例
-                alertStore.removeTodoMap(dateKey);
-                // 控制台输出打印发送个数
-                println('dateKey : ' + dateKey + ', dataStore after send remove length ' + alertStore.getTodoMap()?.size())
-            }
-        })
+            })
+        } catch (Exception e){
+            e.printStackTrace();
+            return;
+        }
     }
 
     /**
@@ -132,38 +143,34 @@ class NewSendJob {
      * @param todo
      */
     void pushMessage (Todo todo) {
-        try{
-            // 获取日程的标题
-            String t = todo.getRealPTitle()
-            String pTitle = t&&t.length()>20?t.substring(0,20):t
-            // 配置消息中心
-            PushCenter.setConfigRootPath('push')
-            // 移动端推送
-            // 创建推送工厂
-            def push = PushCenter.createFactory(ThreadPool.getInstance())
-            // 设置推送类型
-            push.addAndroidPush(PushCenter.MI_PUSH)
-            push.addAndroidPush(PushCenter.J_PUSH)
-            push.addIosPush(PushCenter.J_PUSH)
-            push.addIosPush(PushCenter.MI_PUSH)
-            // 设置推送内容
-            PushBean pushBean = new PushBean(pTitle, todo.getRealPNote()?:"点击查看")
-            pushBean.setTargetValue(todo.pUserId)
-            pushBean.setSoundURL(grailsApplication.config.soundURL)
-            pushBean.addExtra('hrefB', todo.pContainer)
-            pushBean.addExtra('hrefC', todo.id)
-            pushBean.addExtra('messageType', 100) // 闹钟提醒
-            pushBean.addExtra('alertTime', dateKey) // 提醒时间
-            pushBean.addExtra('pTitle', pTitle) // 提醒时间
-            pushBean.addExtra(Constants.EXTRA_PARAM_SOUND_URI, grailsApplication.config.androidSoundURL) // 提醒时间
-            push.notice.push(pushBean)
-            // web端推送
-            def webPush = PushCenter.createFactory(PushCenter.WEB,ThreadPool.getInstance())
-            webPush.webPush('userId' + todo.pUserId, 'todoAlert',
-                    [pTitle:pTitle, id:todo.id, alertTime:dateKey])
-        } catch (Exception e){
-            e.printStackTrace();
-            return;
-        }
+        String t = todo.getRealPTitle()
+        String pTitle = t&&t.length()>20?t.substring(0,20):t
+        PushCenter.setConfigRootPath('push')
+        /************************移动端推送***************************/
+        def push = PushCenter.createFactory(ThreadPool.getInstance())
+        // 设置推送类型
+        push.addAndroidPush(PushCenter.MI_PUSH)
+        push.addAndroidPush(PushCenter.J_PUSH)
+        // push.addAndroidPush(PushCenter.ALI_PUSH)
+//        push.addAndroidPush(PushCenter.HW_PUSH)
+        push.addIosPush(PushCenter.J_PUSH)
+        push.addIosPush(PushCenter.MI_PUSH)
+
+        // 设置推送内容
+        PushBean pushBean = new PushBean(pTitle, todo.getRealPNote()?:"点击查看")
+        pushBean.setTargetValue(todo.pUserId)
+        pushBean.setSoundURL(grailsApplication.config.soundURL)
+        pushBean.addExtra('hrefB', todo.pContainer)
+        pushBean.addExtra('hrefC', todo.id)
+        pushBean.addExtra('messageType', 100) // 闹钟提醒
+        pushBean.addExtra('alertTime', "21:21") // 提醒时间
+        pushBean.addExtra('pTitle', pTitle) // 提醒时间
+
+        pushBean.addExtra(Constants.EXTRA_PARAM_SOUND_URI, grailsApplication.config.androidSoundURL) // 提醒时间
+        push.notice.push(pushBean)
+        /************************web端推送***************************/
+        def webPush = PushCenter.createFactory(PushCenter.WEB,ThreadPool.getInstance())
+        webPush.webPush('userId' + todo.pUserId, 'todoAlert',
+                [pTitle:pTitle, id:todo.id, clock:"21:21"])
     }
 }
