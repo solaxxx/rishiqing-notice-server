@@ -22,6 +22,8 @@ class NewSendJob {
     static String dates = null; // yyyyMMdd
     /** todoMap 的 键 */
     static String dateKey = null; // yyyy-MM-dd HH:mm:ss
+    /** 一个分钟值 */
+    static String minutes = null;
     /** 设置一个触发器 */
     /*
      * 关于 triggers 的说明：
@@ -96,6 +98,8 @@ class NewSendJob {
         dates = alertTime.format("yyyyMMdd");
         // 设置键
         dateKey = alertTime.format("yyyy-MM-dd HH:mm:ss");
+        // 设置分钟数
+        minutes = alertTime.format("HH:mm");
     }
 
     /** 触发条件下直接执行 execute 方法　*/
@@ -166,7 +170,7 @@ class NewSendJob {
             pushBean.addExtra('hrefB', todo.pContainer)
             pushBean.addExtra('hrefC', todo.id)
             pushBean.addExtra('messageType', 100) // 闹钟提醒
-            pushBean.addExtra('alertTime', "21:21") // 提醒时间
+            pushBean.addExtra('alertTime', minutes) // 提醒时间
             pushBean.addExtra('pTitle', pTitle) // 提醒时间
 
             pushBean.addExtra(Constants.EXTRA_PARAM_SOUND_URI, grailsApplication.config.androidSoundURL) // 提醒时间
