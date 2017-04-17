@@ -178,7 +178,7 @@ class NewSendJob {
             /************************web端推送***************************/
             def webPush = PushCenter.createFactory(PushCenter.WEB,ThreadPool.getInstance())
             webPush.webPush('userId' + todo.pUserId, 'todoAlert',
-                    [pTitle:pTitle, id:todo.id, clock:"21:21"])
+                    [pTitle:pTitle, id:todo.id, clock:minutes])
         }
     }
 }
