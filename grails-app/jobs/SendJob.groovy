@@ -45,7 +45,7 @@ class SendJob {
                 }
                 // 消除该时间的提醒数据
                 dataStore.remove(minutes)
-                println('key : ' + minutes + ', dataStore after send remove length ' + dataStore.getDataStore().size())
+//                println('key : ' + minutes + ', dataStore after send remove length ' + dataStore.getDataStore().size())
             }
         })
     }

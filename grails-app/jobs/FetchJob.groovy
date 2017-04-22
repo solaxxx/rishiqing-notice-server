@@ -57,7 +57,7 @@ class FetchJob {
                 }
                 Date end = now
 //                def sss = dataStore.getDataStore()
-                println('key : ' + m + ' time:' + (end.getTime() - start.getTime()) + 'ms dataStore fetch length ' + dataStore.getDataStore().size())
+//                println('key : ' + m + ' time:' + (end.getTime() - start.getTime()) + 'ms dataStore fetch length ' + dataStore.getDataStore().size())
             }
         })
     }
