@@ -1,6 +1,11 @@
 package rishiqing.notice.server
 
+import groovy.sql.GroovyRowResult
+import groovy.sql.Sql
+
 class Todo {
+
+    def dataSource;
 
     transient Date insertDate
     transient String type
@@ -21,7 +26,7 @@ class Todo {
     Boolean isRepeatTodo = false
 
     static hasMany = [clocks: Clock]
-    static belongsTo = [todoDeploy: TodoDeploy,kanbanItem: KanbanItem]
+    static belongsTo = [todoDeploy: TodoDeploy,kanbanItem: KanbanItem,repeatTag: TodoRepeatTag]
 
     //  当前的日程是否已关闭提醒
      def isAlertClose () {
@@ -51,34 +56,67 @@ class Todo {
         ]
     }
 
-//    // 改成这样的格式，看是否能解决懒加载问题。因为在提醒服务器中，todo 和 todoDeploy 和 kanbanItem 是无关联的。
-//    def getRealPTitle() {
-//        TodoDeploy dep = this.todoDeploy?TodoDeploy.findById(this.todoDeployId):null;
-//        return dep ? dep.pTitle : this.pTitle;
-//    }
-//    def getRealPNote(){
-//        TodoDeploy dep = this.todoDeploy?TodoDeploy.findById(this.todoDeployId):null;
-//        return dep? dep.pNote :this.pNote;
-//    }
-//    def getRealStartDate(){
-//        KanbanItem ki = this.kanbanItemId?KanbanItem.findById(this.kanbanItemId):null;
-//        TodoDeploy dep = this.todoDeploy?TodoDeploy.findById(this.todoDeployId):null;
-//        return ki&&!this.isChangeDate&&dep?dep.startDate:this.startDate
-//    }
-//    def getRealEndDate(){
-//        KanbanItem ki = this.kanbanItemId?KanbanItem.findById(this.kanbanItemId):null;
-//        TodoDeploy dep = this.todoDeploy?TodoDeploy.findById(this.todoDeployId):null;
-//        return ki&&!this.isChangeDate&&dep?dep.endDate:this.endDate
-//    }
-//    def getRealDates(){
-//        KanbanItem ki = this.kanbanItemId?KanbanItem.findById(this.kanbanItemId):null;
-//        TodoDeploy dep = this.todoDeploy?TodoDeploy.findById(this.todoDeployId):null;
-//        return ki&&!this.isChangeDate&&dep?dep.dates:this.dates
-//    }
+    /*
+     * 这里使用纯 sql 的原因是各表之间无法建立直接关联导致的，提醒服务器禁止任何表之间建立关联
+     */
+    /**
+     * 获取标题
+     * @return
+     */
+    def getRealPTitle(){
+        // sql 对象
+        Sql sql = new Sql(dataSource);
+        // 获取 todoDeployId
+        GroovyRowResult idField = sql.firstRow("select t.todo_deploy_id as id from todo as t where t.id = ?",[this.id]);
+        Long depId = idField[0];
+        String title;
+        // 获取标题
+        if(depId){
+            GroovyRowResult titleField = sql.firstRow("select dep.p_title as title from todo_deploy as dep where dep.id = ?",[depId]);
+            title = titleField[0];
+        } else {
+            title = this.pTitle;
+        }
+        // 返回
+        return title;
+    }
 
-    def getRealPTitle(){return this.todoDeploy?this.todoDeploy.pTitle:this.pTitle}
-    def getRealPNote(){return this.todoDeploy?this.todoDeploy.pNote:this.pNote}
+    /**
+     * 获取内容
+     * @return
+     */
+    def getRealPNote(){
+        // sql 对象
+        Sql sql = new Sql(dataSource);
+        // 获取 todoDeployId
+        GroovyRowResult idField = sql.firstRow("select t.todo_deploy_id as id from todo as t where t.id = ?",[this.id]);
+        Long depId = idField[0];
+        // 获取内容
+        String note;
+        if(depId){
+            GroovyRowResult noteField = sql.firstRow("select dep.p_note as note from todo_deploy as dep where dep.id = ?",[depId]);
+            note = noteField[0];
+        } else {
+            note = this.pNote;
+        }
+        return note;
+    }
+    /**
+     * 获取开始时间
+     * @return
+     */
+    @Deprecated
     def getRealStartDate(){return this.kanbanItem&&!this.isChangeDate&&this.todoDeploy?this.todoDeploy.startDate:this.startDate}
+    /**
+     * 获取结束时间
+     * @return
+     */
+    @Deprecated
     def getRealEndDate(){return this.kanbanItem&&!this.isChangeDate&&this.todoDeploy?this.todoDeploy.endDate:this.endDate}
+    /**
+     * 获取离散时间
+     * @return
+     */
+    @Deprecated
     def getRealDates(){return this.kanbanItem&&!this.isChangeDate&&this.todoDeploy?this.todoDeploy.dates:this.dates}
 }

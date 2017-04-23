@@ -7,8 +7,7 @@ hibernate:
         region.factory_class: 'org.hibernate.cache.ehcache.EhCacheRegionFactory'
 
 dataSource:
-#     logSql: true
-#     formatSql: true
+#    logSql: true   # 如果需要使用并查看 sql ，请打开此注释
     pooled: true
     dbCreate: ''
     jmxExport: true

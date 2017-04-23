@@ -1,5 +1,7 @@
 import alertStore.AlertStore
 import groovy.sql.Sql
+import org.hibernate.Criteria
+import org.hibernate.criterion.CriteriaSpecification
 import rishiqing.notice.server.Alert
 import rishiqing.notice.server.Clock
 import rishiqing.notice.server.Todo
@@ -64,12 +66,16 @@ class NewFetchJob {
     def getAlertCount () {
         def alertCount = Todo.createCriteria().count {
             and{
+                //0：表示inner join，
+                //1：表示left outer join ，
+                //2：表示right outer join
+                createAlias("repeatTag","trt",1)
+                createAlias("todoDeploy","d",1)
                 or{
-                    like("dates","%${dates}%")
+                    isNull("repeatTag");
                     and{
-                        isNull("dates")
-                        le("startDate",taskDate)
-                        ge("endDate",taskDate)
+                        isNotNull("repeatTag")
+                        like("trt.repeatBaseTime","%${dates}%")
                     }
                 }
                 eq("isDeleted", false)
@@ -98,13 +104,20 @@ class NewFetchJob {
     def getResult (def offset) {
         List<Todo> todoList = Todo.createCriteria().list(max:max,offset:offset) {
             and{
+                //0：表示inner join，
+                //1：表示left outer join ，
+                //2：表示right outer join
+                // 左连接 todoRepeatTag
+                createAlias("repeatTag","trt",1)
+                // 左连接 todoDeploy
                 createAlias("todoDeploy","d",1)
                 or{
-                    like("dates","%${dates}%")
+                    // 如果重复标记不存在
+                    isNull("repeatTag");
+                    // 或者重复标记存在，且在重复基本时间中设置过提醒
                     and{
-                        isNull("dates")
-                        le("startDate",taskDate)
-                        ge("endDate",taskDate)
+                        isNotNull("repeatTag")
+                        like("trt.repeatBaseTime","%${dates}%")
                     }
                 }
                 eq("isDeleted", false)

@@ -107,10 +107,6 @@ class NewSendJob {
         try{
             // 获取当前时间(为 dateStr 和 minutes 赋值)
             initTime()
-            def a = alertTime;
-            def b = dates;
-            def c = dateKey;
-            Map<Long,Todo> alertTodos = alertStore.getTodoMap(dateKey);
             // 获取当前时间需要发送的提醒
             def todoMap = alertStore.getTodoMap(dateKey);
             // 启动线程
