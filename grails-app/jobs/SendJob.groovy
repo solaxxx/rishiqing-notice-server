@@ -22,9 +22,9 @@ class SendJob {
 
     static String minutes =  null        // 当前时间的分钟字符串 HH:mm
 
-    static triggers = {
-        simple startDelay:1000*60,repeatInterval: 1000*60  // execute job once in 1 minute
-    }
+//    static triggers = {
+//        simple startDelay:1000*60,repeatInterval: 1000*60  // execute job once in 1 minute
+//    }
 
     def execute() {
         getDay()

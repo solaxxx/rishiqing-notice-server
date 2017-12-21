@@ -1,9 +1,4 @@
 import alertStore.AlertStore
-import groovy.sql.Sql
-import org.hibernate.Criteria
-import org.hibernate.criterion.CriteriaSpecification
-import rishiqing.notice.server.Alert
-import rishiqing.notice.server.Clock
 import rishiqing.notice.server.Todo
 import threadPool.ThreadPoolUtil
 
@@ -27,10 +22,12 @@ class NewFetchJob {
     static String dateKey = null; // yyyy-MM-dd HH:mm:ss
     /** 触发器 */
     static triggers = {
-        // 服务器启动后 1 分钟开始执行调度
-        simple(startDelay: 1000*60);
+        // 如果添加了 cron 表达式，就不能使用 simple,否则每次同样会执行 simple 默认的触发查询，即每次查询两遍
+        // simple(startDelay: 1000*60);
+
+        println "todoFetchJob 触发器启动"
         // 使用 cron 表达式进行触发操作
-        cron(name:"todoFetchJob",cronExpression: "0 0/1 * * * ?");
+        cron(name:"todoFetchJob",startDelay: 60000,cronExpression: "0 0/1 * * * ?");
     }
 
     /**
@@ -107,6 +104,7 @@ class NewFetchJob {
                 //0：表示inner join，
                 //1：表示left outer join ，
                 //2：表示right outer join
+
                 // 左连接 todoRepeatTag
                 createAlias("repeatTag","trt",1)
                 // 左连接 todoDeploy

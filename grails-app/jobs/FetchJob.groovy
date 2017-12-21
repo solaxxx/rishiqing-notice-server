@@ -28,9 +28,9 @@ class FetchJob {
 
     static Date today = null
 
-    static triggers = {
-      simple repeatInterval: 1000*60  // execute job once in 1 minute
-    }
+//    static triggers = {
+////      simple repeatInterval: 1000*60  // execute job once in 1 minute
+//    }
 
     def execute() {
         getDay2()

@@ -25,9 +25,10 @@ class NewSendJob {
     /** 一个分钟值 */
     static String minutes = null;
     /** 设置一个触发器 */
-    /*
+/*
      * 关于 triggers 的说明：
-     *
+     * 具体可见博客
+     * @link http://blog.csdn.net/wangyongwyk/article/details/5534966
      *      class MyJob {
      *          static triggers = {
      *              // 定义一个触发器，name是 mySimpleTrigger，在服务器启动 60000 mill 后开始运行，并每隔 1000 mill 运行一次
@@ -51,6 +52,8 @@ class NewSendJob {
      *            def execute(){ print "Job run!" }
      *       }
      *
+     * 注意！simple 和 cron 不能一起使用，如果一起使用，就会查询两次。
+     *
      * 关于 cron 表达式:
      *
      * 具体可见博客:
@@ -59,7 +62,7 @@ class NewSendJob {
      * @link http://cron.qqe2.com/
      *
      * 两种格式：
-     *      秒       份       时   月中的哪一天   月     周中的哪一天   年
+     *      秒       分       时   月中的哪一天   月     周中的哪一天   年
      *      Seconds Minutes Hours DayofMonth   Month  DayofWeek   Year 或
      *      Seconds Minutes Hours DayofMonth   Month  DayofWeek
      *
@@ -76,11 +79,10 @@ class NewSendJob {
      *
      * */
     static triggers = {
-        // 服务器启动 1 分钟后开始运行
-        simple name: 'mySimpleTrigger', startDelay: 60000;
-        // 使用 cron 表达式进行控制：每隔2分钟进行一次调度
+        println "todoSendJob 触发器启动";
+        // 使用 cron 表达式进行控制：服务器启动 1 分钟后开始运行，每隔2分钟进行一次调度
 //        cron(name:"todoSendJob",cronExpression: "0 0/1 * * * ?");
-        cron(name:"todoSendJob",cronExpression: "0 0/1 * * * ?");
+        cron(name:"todoSendJob",startDelay: 60000,cronExpression: "0 0/1 * * * ?");
     }
 
     /**
