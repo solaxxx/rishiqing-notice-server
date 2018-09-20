@@ -2,8 +2,10 @@ import alertStore.AlertStore
 import com.rishiqing.PushCenter
 import com.rishiqing.base.push.PushBean
 import com.xiaomi.xmpush.server.Constants
+import grails.converters.JSON
 import grails.core.GrailsApplication
 import rishiqing.notice.server.Todo
+import rishiqing.notice.server.User
 import threadPool.ThreadPool
 import threadPool.ThreadPoolUtil
 
@@ -177,6 +179,46 @@ class NewSendJob {
             def webPush = PushCenter.createFactory(PushCenter.WEB,ThreadPool.getInstance())
             webPush.webPush('userId' + todo.pUserId, 'todoAlert',
                     [pTitle:pTitle, id:todo.id, clock:minutes])
+
+            // 企业微信
+            String qywxUrn = "#/sche/todo/${todo.id}"
+            def qywxUrl = grailsApplication.config.qywxUrl
+            def qywxPageUri = grailsApplication.config.qywxPageUri
+            def qywxInterfaceUri = grailsApplication.config.qywxInterfaceUri
+            User user
+            User.withNewSession {
+                user = User.findById(todo.pUserId.toLong())
+            }
+            // 企业微信公司和用户标识
+            String outerId = user.outerId
+            if(!outerId){
+                return
+            }
+            def outerArray = outerId.split("--")
+            if(outerArray.length<2){
+                return
+            }
+            // 企业微信公司id
+            def qywxCorpId = outerArray[0]
+            // 企业用户id
+            def qywxUserId = outerArray[1]
+            // 请求参数Map
+            def bodyMap = [
+                    "touser": qywxUserId,
+                    "textcard": [
+                            "title": t,
+                            "description": "任务",
+                            "url": "${qywxUrl}${qywxPageUri}?corpid=${qywxCorpId}${qywxUrn}"
+//                    "url": "https://qywx.rishiqing.com/qywxbackwebapp/index.html?corpid=wxec002534a59ea2e7#/sche/todo/60117050"
+//                    "url": "https://qywx.rishiqing.com/qywxbackwebapp/index.html?corpid=wxec002534a59ea2e7#/plan/todo/60117050"
+//                    "url": "https://qywx.rishiqing.com/qywxbackwebapp/index.html?corpid=wxec002534a59ea2e7#/plan/60117050/child-plan"
+                    ]
+            ]
+            def bodyJson = bodyMap as JSON
+            HttpKit.doPost("${qywxUrl}${qywxInterfaceUri}/msg/sendNotification?corpid=${qywxCorpId}",
+                    [:],
+                    ["content-type": "application/json;charset=UTF-8"],
+                    bodyJson.toString())
         }
     }
 }

@@ -13,9 +13,9 @@ dataSource:
     jmxExport: true
     driverClassName: com.mysql.jdbc.Driver
     dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-    username: root
-    password: 123456
-    url: jdbc:mysql://localhost:3306/zhouqiang?autoReconnect=true&characterEncoding=utf-8&useSSL=false
+    username: rishiqing-beta-old-user
+    password: rsQcReate640321
+    url: jdbc:mysql://rm-2zen2a9e3l24p17i7fo.mysql.rds.aliyuncs.com:3306/rishiqing_beta_old?autoReconnect=true&characterEncoding=utf-8&useSSL=false
     properties:
         maxActive: -1
         minEvictableIdleTimeMillis: 1800000
@@ -116,3 +116,13 @@ fetchMinute: 60 # fetch every 10 minutes
 preFetchMinute: 2 # 查询job提前查询几分钟的数据
 soundURL: Umbriel.aiff
 androidSoundURL: android.resource://com.rishiqing/raw/alarm2
+
+#beta
+qywxUrl: https://qywx-beta.rishiqing.com
+qywxPageUri: /qywxbackwebapp/index.html
+qywxInterfaceUri: /qywxbackauth
+
+#官网
+#qywxUrl: https://qywx.rishiqing.com
+#qywxPageUri: /qywxbackwebapp/index.html
+#qywxInterfaceUri: /qywxbackauth
