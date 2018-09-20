@@ -28,9 +28,9 @@ class FetchJob {
 
     static Date today = null
 
-    static triggers = {
-      simple repeatInterval: 1000*60  // execute job once in 1 minute
-    }
+//    static triggers = {
+////      simple repeatInterval: 1000*60  // execute job once in 1 minute
+//    }
 
     def execute() {
         getDay2()
@@ -57,7 +57,7 @@ class FetchJob {
                 }
                 Date end = now
 //                def sss = dataStore.getDataStore()
-                println('key : ' + m + ' time:' + (end.getTime() - start.getTime()) + 'ms dataStore fetch length ' + dataStore.getDataStore().size())
+//                println('key : ' + m + ' time:' + (end.getTime() - start.getTime()) + 'ms dataStore fetch length ' + dataStore.getDataStore().size())
             }
         })
     }
